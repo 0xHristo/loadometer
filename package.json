@@ -1,6 +1,6 @@
 {
   "name": "loadometer",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Profile how long your app spends loading modules (require and import, Node and Bun) as folded stacks you can render into a flame graph.",
   "keywords": [
     "flamegraph",
