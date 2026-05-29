@@ -16,7 +16,7 @@
  * some depth and width worth looking at.
  */
 
-// In a real project: require('deps');
+// In a real project: require('loadometer');
 require('../index.ts');
 
 // A small "startup" that pulls in real dependency trees. Each nested require

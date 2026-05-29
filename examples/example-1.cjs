@@ -18,7 +18,7 @@
  */
 
 // In a real project that installed the package, this is simply:
-//     require('deps');
+//     require('loadometer');
 require('../index.ts');
 
 // Anything required from here on is timed. Real packages have real load cost,

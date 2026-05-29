@@ -1,24 +1,24 @@
-# deps
+# loadometer
 
 See where your app spends time **loading modules**, as a flame graph.
 
-`deps` patches `require()` and times every module that gets loaded. It prints the
+`loadometer` patches `require()` and times every module that gets loaded. It prints the
 result as [folded stacks](https://github.com/brendangregg/FlameGraph#2-fold-stacks)
 (`import;chain milliseconds`) — the format flame-graph tools understand.
 
 ## Install
 
 ```sh
-npm install --save-dev deps
+npm install --save-dev loadometer
 ```
 
 ## Usage
 
-Import `deps` at the **very top** of your entry file, before anything else.
+Import `loadometer` at the **very top** of your entry file, before anything else.
 Everything loaded after that line is timed.
 
 ```js
-require('deps'); // must be first
+require('loadometer'); // must be first
 require('./app');
 ```
 
@@ -72,7 +72,7 @@ DEPS_OUT_FILE=imports.folded node examples/example-2.cjs # file + flame graph
 ## Notes
 
 - Loads under 1ms are skipped to keep the graph readable.
-- `deps` measures `require()` loads. If your `import` statements compile to
+- `loadometer` measures `require()` loads. If your `import` statements compile to
   `require()` — TypeScript or Babel targeting CommonJS, `ts-node`, `tsx` — they're
   captured. Pure native ESM (`"type": "module"` with no transpilation) isn't,
   because those imports load before any of your code runs.

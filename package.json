@@ -1,7 +1,7 @@
 {
-  "name": "deps",
+  "name": "loadometer",
   "version": "0.1.0",
-  "description": "Import `deps` at the top of your entry file to print folded stacks of module require() times (pipe into a flame graph).",
+  "description": "Import `loadometer` at the top of your entry file to print folded stacks of module require() times (pipe into a flame graph).",
   "keywords": [
     "flamegraph",
     "profiler",
@@ -14,12 +14,12 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
