@@ -1,6 +1,6 @@
 {
   "name": "loadometer",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Import `loadometer` at the top of your entry file to print folded stacks of module require() times (pipe into a flame graph).",
   "keywords": [
     "flamegraph",
@@ -37,6 +37,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
+    },
+    "./register": {
+      "import": "./dist/register.mjs",
+      "require": "./dist/register.js"
     }
   },
   "main": "./dist/index.js",
@@ -46,8 +50,15 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup index.ts --format esm,cjs --dts --clean --platform node --target node18",
+    "build": "tsup index.ts register.ts --format esm,cjs --dts --clean --platform node --target node18",
     "test": "node --test test/index.test.mjs",
+    "example:1": "node examples/example-1.cjs",
+    "example:2": "LOADOMETER_OUT_FILE=imports.folded node examples/example-2.cjs",
+    "example:node-cjs": "cd examples/node-cjs && node main.js",
+    "example:bun-cjs": "cd examples/bun-cjs && bun main.js",
+    "example:node-esm": "cd examples/node-esm && node --no-warnings --import ../../register.ts main.js",
+    "example:bun-esm": "cd examples/bun-esm && bun --preload ../../register.ts main.js",
+    "examples": "npm run example:1 && npm run example:2 && npm run example:node-cjs && npm run example:bun-cjs && npm run example:node-esm && npm run example:bun-esm",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
