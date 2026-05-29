@@ -1,0 +1,29 @@
+{
+  "name": "deps",
+  "version": "0.1.0",
+  "description": "Import `deps` at the top of your entry file to print folded stacks of module require() times (pipe into a flame graph).",
+  "keywords": ["flamegraph", "profiler", "imports", "require", "startup", "performance"],
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup index.ts --format esm,cjs --dts --clean --platform node --target node18",
+    "test": "node --test test/index.test.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.19",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2"
+  }
+}
