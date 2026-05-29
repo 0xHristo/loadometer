@@ -43,19 +43,36 @@ function run(cmd, args, scenario) {
 }
 
 const cases = [
-  { name: 'Node + CommonJS (require patch)', cmd: process.execPath, args: ['main.js'], dir: 'node-cjs' },
+  { name: 'Node + JS + CommonJS (require patch)', cmd: process.execPath, args: ['main.js'], dir: 'node-js-cjs' },
   {
-    name: 'Node + native ESM (register preload)',
+    name: 'Node + JS + native ESM (register preload)',
     cmd: process.execPath,
     args: ['--no-warnings', '--import', register, 'main.js'],
-    dir: 'node-esm',
+    dir: 'node-js-esm',
   },
-  { name: 'Bun + CommonJS (require patch)', cmd: 'bun', args: ['main.js'], dir: 'bun-cjs', bun: true },
+  { name: 'Bun + JS + CommonJS (require patch)', cmd: 'bun', args: ['main.js'], dir: 'bun-js-cjs', bun: true },
   {
-    name: 'Bun + native ESM (register preload)',
+    name: 'Bun + JS + native ESM (register preload)',
     cmd: 'bun',
     args: ['--preload', register, 'main.js'],
-    dir: 'bun-esm',
+    dir: 'bun-js-esm',
+    bun: true,
+  },
+
+  // TypeScript
+  { name: 'Node + TS + CommonJS (require patch)', cmd: process.execPath, args: ['--no-warnings', 'main.ts'], dir: 'node-ts-cjs' },
+  {
+    name: 'Node + TS + native ESM (register preload)',
+    cmd: process.execPath,
+    args: ['--no-warnings', '--import', register, 'main.ts'],
+    dir: 'node-ts-esm',
+  },
+  { name: 'Bun + TS + CommonJS (require patch)', cmd: 'bun', args: ['main.ts'], dir: 'bun-ts-cjs', bun: true },
+  {
+    name: 'Bun + TS + native ESM (register preload)',
+    cmd: 'bun',
+    args: ['--preload', register, 'main.ts'],
+    dir: 'bun-ts-esm',
     bun: true,
   },
 ];

@@ -1,5 +1,5 @@
 {
-  "name": "scenario-node-cjs",
+  "name": "scenario-node-js-cjs",
   "private": true,
   "scripts": { "start": "node main.js" }
 }

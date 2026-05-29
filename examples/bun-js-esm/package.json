@@ -1,5 +1,5 @@
 {
-  "name": "scenario-bun-esm",
+  "name": "scenario-bun-js-esm",
   "private": true,
   "type": "module",
   "scripts": { "start": "bun --preload ../../register.ts main.js" }

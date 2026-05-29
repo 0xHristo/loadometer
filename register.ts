@@ -81,8 +81,9 @@ if (Bun) {
     load(url, ctx, next) {
       const t = performance.now();
       const r = next(url, ctx);
-      // Instrument both ESM and CommonJS source; skip builtins/JSON (no source).
-      if ((r.format === 'module' || r.format === 'commonjs') && r.source != null) {
+      // Instrument ESM + CommonJS source, including the `*-typescript` formats
+      // Node reports for type-stripped .ts; skip builtins/JSON (no source).
+      if (r.source != null && (r.format?.startsWith('module') || r.format?.startsWith('commonjs'))) {
         add(url, performance.now() - t);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const text = typeof r.source === 'string' ? r.source : new TextDecoder().decode(r.source as any);

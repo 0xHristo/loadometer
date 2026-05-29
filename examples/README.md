@@ -10,18 +10,22 @@ node examples/example-1.cjs                              # console output
 LOADOMETER_OUT_FILE=imports.folded node examples/example-2.cjs # file + flame graph
 ```
 
-## Runtime × module-system matrix
+## Runtime × language × module-system matrix
 
-Four self-contained repos covering the full matrix: **Node / Bun × CommonJS / ESM**.
-Each loads a small nested tree (`main → a → b`) that burns a few ms, so you get
-real folded stacks. Run from inside each folder.
+Eight self-contained repos covering the full matrix: **Node / Bun × JS / TS ×
+CommonJS / ESM**. Each loads a small nested tree (`main → a → b`) that burns a
+few ms, so you get real folded stacks. Run from inside each folder.
 
-| Folder     | Runtime | Module system        | Command                                       |
-|------------|---------|----------------------|-----------------------------------------------|
-| `node-cjs` | Node    | CommonJS             | `node main.js`                                |
-| `bun-cjs`  | Bun     | CommonJS             | `bun main.js`                                 |
-| `node-esm` | Node    | ESM (`type: module`) | `node --import ../../register.ts main.js`     |
-| `bun-esm`  | Bun     | ESM (`type: module`) | `bun --preload ../../register.ts main.js`     |
+| Folder         | Runtime | Lang | Module system        | Command                                       |
+|----------------|---------|------|----------------------|-----------------------------------------------|
+| `node-js-cjs`  | Node    | JS   | CommonJS             | `node main.js`                                |
+| `bun-js-cjs`   | Bun     | JS   | CommonJS             | `bun main.js`                                 |
+| `node-js-esm`  | Node    | JS   | ESM (`type: module`) | `node --import ../../register.ts main.js`     |
+| `bun-js-esm`   | Bun     | JS   | ESM (`type: module`) | `bun --preload ../../register.ts main.js`     |
+| `node-ts-cjs`  | Node    | TS   | CommonJS             | `node main.ts`                                |
+| `bun-ts-cjs`   | Bun     | TS   | CommonJS             | `bun main.ts`                                 |
+| `node-ts-esm`  | Node    | TS   | ESM (`type: module`) | `node --import ../../register.ts main.ts`     |
+| `bun-ts-esm`   | Bun     | TS   | ESM (`type: module`) | `bun --preload ../../register.ts main.ts`     |
 
 Prefix any command with `LOADOMETER_OUT_FILE=out.folded` to write to a file
 instead of the console.
@@ -41,10 +45,14 @@ From the repo root:
 ```sh
 npm run example:1          # console output
 npm run example:2          # writes imports.folded
-npm run example:node-cjs
-npm run example:bun-cjs
-npm run example:node-esm
-npm run example:bun-esm
+npm run example:node-js-cjs
+npm run example:bun-js-cjs
+npm run example:node-js-esm
+npm run example:bun-js-esm
+npm run example:node-ts-cjs
+npm run example:bun-ts-cjs
+npm run example:node-ts-esm
+npm run example:bun-ts-esm
 npm run examples           # all of the above
 ```
 

@@ -1,5 +1,5 @@
 {
-  "name": "scenario-bun-cjs",
+  "name": "scenario-bun-js-cjs",
   "private": true,
   "scripts": { "start": "bun main.js" }
 }

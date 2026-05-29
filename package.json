@@ -1,6 +1,6 @@
 {
   "name": "loadometer",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Profile how long your app spends loading modules (require and import, Node and Bun) as folded stacks you can render into a flame graph.",
   "keywords": [
     "flamegraph",
@@ -55,11 +55,15 @@
     "test": "node --test test/index.test.mjs",
     "example:1": "node examples/example-1.cjs",
     "example:2": "LOADOMETER_OUT_FILE=imports.folded node examples/example-2.cjs",
-    "example:node-cjs": "cd examples/node-cjs && node main.js",
-    "example:bun-cjs": "cd examples/bun-cjs && bun main.js",
-    "example:node-esm": "cd examples/node-esm && node --no-warnings --import ../../register.ts main.js",
-    "example:bun-esm": "cd examples/bun-esm && bun --preload ../../register.ts main.js",
-    "examples": "npm run example:1 && npm run example:2 && npm run example:node-cjs && npm run example:bun-cjs && npm run example:node-esm && npm run example:bun-esm",
+    "example:node-js-cjs": "cd examples/node-js-cjs && node main.js",
+    "example:bun-js-cjs": "cd examples/bun-js-cjs && bun main.js",
+    "example:node-js-esm": "cd examples/node-js-esm && node --no-warnings --import ../../register.ts main.js",
+    "example:bun-js-esm": "cd examples/bun-js-esm && bun --preload ../../register.ts main.js",
+    "example:node-ts-cjs": "cd examples/node-ts-cjs && node --no-warnings main.ts",
+    "example:bun-ts-cjs": "cd examples/bun-ts-cjs && bun main.ts",
+    "example:node-ts-esm": "cd examples/node-ts-esm && node --no-warnings --import ../../register.ts main.ts",
+    "example:bun-ts-esm": "cd examples/bun-ts-esm && bun --preload ../../register.ts main.ts",
+    "examples": "npm run example:1 && npm run example:2 && npm run example:node-js-cjs && npm run example:bun-js-cjs && npm run example:node-js-esm && npm run example:bun-js-esm && npm run example:node-ts-cjs && npm run example:bun-ts-cjs && npm run example:node-ts-esm && npm run example:bun-ts-esm",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {

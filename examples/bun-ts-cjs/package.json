@@ -1,0 +1,5 @@
+{
+  "name": "scenario-bun-ts-cjs",
+  "private": true,
+  "scripts": { "start": "bun main.ts" }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "scenario-node-ts-esm",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node --no-warnings --import ../../register.ts main.ts" }
+}

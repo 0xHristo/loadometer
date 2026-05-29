@@ -1,0 +1,5 @@
+{
+  "name": "scenario-node-ts-cjs",
+  "private": true,
+  "scripts": { "start": "node --no-warnings main.ts" }
+}

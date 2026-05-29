@@ -1,5 +1,5 @@
 {
-  "name": "scenario-node-esm",
+  "name": "scenario-node-js-esm",
   "private": true,
   "type": "module",
   "scripts": { "start": "node --import ../../register.ts main.js" }
