@@ -1,32 +1,76 @@
-// Preload entry for native ESM (`type: module`) projects, where `require` is
-// never called. Run it as a preload so the hooks register before your app's
-// module graph loads:
+// Preload entry: `node --import loadometer/register app.js` (Node) or
+// `bun --preload loadometer/register app.js` (Bun).
 //
-//     node --import loadometer/register app.js        (Node)
-//     bun  --preload loadometer/register app.js        (Bun)
-//
-// It times each module's load (read + transpile) AND its evaluation, by
-// rewriting the source to record timestamps around the module body — the only
-// way to observe evaluation, since neither runtime exposes an "evaluate" hook.
+// Two capture mechanisms feed one set of folded stacks:
+//   • CommonJS  -> patch Module.prototype.require. require() is called on every
+//     load, including cached re-requires and built-ins, in both Node and Bun,
+//     so this sees the *whole* require graph. Self-time per frame.
+//   • native ESM -> loader hooks (Node registerHooks / Bun.plugin) that time
+//     each module's load and rewrite its source to time evaluation. (Loader
+//     hooks can't see cached requires or built-ins, which is why CommonJS uses
+//     the require patch instead.)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 import * as nodeModule from 'node:module';
 
 const out = process.env.LOADOMETER_OUT_FILE;
-const ms = new Map<string, number>(); // module id -> total ms (load + evaluation)
-const parent = new Map<string, string | undefined>(); // module id -> importer id
-const started = new Map<string, number>();
-const add = (id: string, t: number) => ms.set(id, (ms.get(id) ?? 0) + t);
-
-// Called by the markers injected into each module body (evaluation timing).
-(globalThis as Record<string, unknown>).__LM = {
-  enter: (id: string) => started.set(id, performance.now()),
-  exit: (id: string) => add(id, performance.now() - started.get(id)!),
+const totals = new Map<string, number>(); // folded stack -> self ms
+const record = (stack: string, ms: number) => {
+  if (stack) totals.set(stack, (totals.get(stack) ?? 0) + Math.max(0, ms));
 };
 
-// Wrap a module's source so its evaluation is timed. Inject *after* a leading
-// hashbang and any `'use strict'` directive, so neither is demoted.
+// Shorten a file URL or path to a readable frame label. Require specifiers
+// (e.g. "parseurl", "./lib/app", "node:http") are kept as written.
+const short = (id: string): string => {
+  if (!id.startsWith('file:') && !id.startsWith('/')) return id;
+  let p = id;
+  if (id.startsWith('file:')) {
+    try {
+      p = fileURLToPath(id);
+    } catch {
+      return id;
+    }
+  }
+  const i = p.lastIndexOf('node_modules/');
+  if (i >= 0) return p.slice(i + 13);
+  const cwd = process.cwd();
+  return p.startsWith(cwd) ? p.slice(cwd.length).replace(/^[/\\]+/, '') : p;
+};
+
+// ---------------------------------------------------------------- CommonJS ---
+const cjsStack: string[] = [];
+if (process.argv[1]) cjsStack.push(short(process.argv[1])); // root at the entry
+const childMs: number[] = [];
+const realRequire = nodeModule.Module.prototype.require;
+nodeModule.Module.prototype.require = function (this: unknown, ...args: unknown[]) {
+  cjsStack.push(String(args[0]));
+  const stack = cjsStack.join(';');
+  childMs.push(0);
+  const start = performance.now();
+  try {
+    return realRequire.apply(this, args as [string]);
+  } finally {
+    const inclusive = performance.now() - start;
+    const own = childMs.pop()!;
+    if (childMs.length) childMs[childMs.length - 1] += inclusive;
+    record(stack, inclusive - own); // exclusive self-time
+    cjsStack.pop();
+  }
+};
+
+// -------------------------------------------------------------- native ESM ---
+const esmMs = new Map<string, number>(); // url -> ms
+const parent = new Map<string, string | undefined>();
+const started = new Map<string, number>();
+const addEsm = (url: string, ms: number) => esmMs.set(url, (esmMs.get(url) ?? 0) + ms);
+
+// Markers injected into module bodies time their evaluation.
+(globalThis as Record<string, unknown>).__LM = {
+  enter: (id: string) => started.set(id, performance.now()),
+  exit: (id: string) => addEsm(id, performance.now() - started.get(id)!),
+};
+
 const instrument = (id: string, source: string) => {
   const tag = JSON.stringify(id);
   const head = `globalThis.__LM.enter(${tag});\n`;
@@ -59,14 +103,14 @@ if (Bun) {
           const id = Bun.resolveSync(args.path, args.importer ? dirname(args.importer) : process.cwd());
           if (!parent.has(id)) parent.set(id, args.importer || undefined);
         } catch {
-          /* leave unresolved entries out of the tree */
+          /* ignore unresolved */
         }
-        return undefined; // let Bun resolve normally
+        return undefined;
       });
       build.onLoad({ filter: /\.(m?[jt]sx?|cjs)$/ }, (args) => {
         const t = performance.now();
         const src = readFileSync(args.path, 'utf8');
-        add(args.path, performance.now() - t);
+        addEsm(args.path, performance.now() - t);
         return { contents: instrument(args.path, src), loader: loader(args.path) };
       });
     },
@@ -81,14 +125,11 @@ if (Bun) {
     load(url, ctx, next) {
       const t = performance.now();
       const r = next(url, ctx);
-      // Instrument any JS/TS source. Node reports `format: 'commonjs'` for the
-      // entry but leaves it **undefined** for nested require()'d modules, so we
-      // treat an absent format as code and only skip known non-code formats
-      // (json / wasm / builtin / addon, which also tend to have no string source).
-      const fmt = r.format;
-      const isCode = fmt == null || fmt.startsWith('module') || fmt.startsWith('commonjs');
-      if (r.source != null && isCode) {
-        add(url, performance.now() - t);
+      // Native ESM, plus TypeScript-CommonJS (whose require() goes through
+      // createRequire and so bypasses the patch above). Plain `commonjs` /
+      // undefined is left to the require patch to avoid double-counting.
+      if (r.source != null && (r.format?.startsWith('module') || r.format === 'commonjs-typescript')) {
+        addEsm(url, performance.now() - t);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const text = typeof r.source === 'string' ? r.source : new TextDecoder().decode(r.source as any);
         r.source = instrument(url, text);
@@ -98,22 +139,8 @@ if (Bun) {
   });
 }
 
-// Shorten an id (file URL or path) to a readable frame label.
-const short = (id: string) => {
-  let p = id;
-  if (id.startsWith('file:')) {
-    try {
-      p = fileURLToPath(id);
-    } catch {
-      return id;
-    }
-  }
-  const i = p.lastIndexOf('node_modules/');
-  return i >= 0 ? p.slice(i + 13) : p.replace(process.cwd() + '/', '');
-};
-
-// Walk the importer chain into a root-first folded stack.
-const stack = (id: string) => {
+// Walk the ESM importer chain into a root-first folded stack.
+const esmStack = (id: string) => {
   const names: string[] = [];
   const seen = new Set<string>();
   let cur: string | undefined = id;
@@ -130,18 +157,14 @@ let flushed = false;
 const flush = () => {
   if (flushed) return;
   flushed = true;
+  for (const [url, ms] of esmMs) record(esmStack(url), ms); // fold ESM into totals
   let lines = '';
-  for (const [id, t] of ms) {
-    const s = stack(id);
-    if (s) lines += `${s} ${Math.round(t)}\n`;
-  }
+  for (const [stack, ms] of totals) lines += `${stack} ${Math.round(ms)}\n`;
   if (out) writeFileSync(out, lines);
   else if (lines) process.stdout.write(lines);
 };
 
 process.on('exit', flush);
-// Long-running processes (servers) are usually stopped with Ctrl+C / kill,
-// which doesn't trigger `exit` — flush on the signal, then terminate.
 for (const sig of ['SIGINT', 'SIGTERM'] as const) {
   process.once(sig, () => {
     flush();
