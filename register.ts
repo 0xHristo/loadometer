@@ -81,9 +81,13 @@ if (Bun) {
     load(url, ctx, next) {
       const t = performance.now();
       const r = next(url, ctx);
-      // Instrument ESM + CommonJS source, including the `*-typescript` formats
-      // Node reports for type-stripped .ts; skip builtins/JSON (no source).
-      if (r.source != null && (r.format?.startsWith('module') || r.format?.startsWith('commonjs'))) {
+      // Instrument any JS/TS source. Node reports `format: 'commonjs'` for the
+      // entry but leaves it **undefined** for nested require()'d modules, so we
+      // treat an absent format as code and only skip known non-code formats
+      // (json / wasm / builtin / addon, which also tend to have no string source).
+      const fmt = r.format;
+      const isCode = fmt == null || fmt.startsWith('module') || fmt.startsWith('commonjs');
+      if (r.source != null && isCode) {
         add(url, performance.now() - t);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const text = typeof r.source === 'string' ? r.source : new TextDecoder().decode(r.source as any);

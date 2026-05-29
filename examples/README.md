@@ -27,6 +27,18 @@ few ms, so you get real folded stacks. Run from inside each folder.
 | `node-ts-esm`  | Node    | TS   | ESM (`type: module`) | `node --import ../../register.ts main.ts`     |
 | `bun-ts-esm`   | Bun     | TS   | ESM (`type: module`) | `bun --preload ../../register.ts main.ts`     |
 
+The CommonJS repos also include a **`preload.js` / `preload.ts`** entry (alongside
+`main.*`) with no in-file `require('loadometer')` — run it via the preload to
+profile a CommonJS app the universal way:
+
+```sh
+cd node-js-cjs && node --import ../../register.ts preload.js   # Node only
+```
+
+This is the regression case for "the Node preload captures nested `require()`'d
+modules, not just the entry." (Bun's preload can't see `require()`'d CommonJS, so
+there's no Bun equivalent.)
+
 Prefix any command with `LOADOMETER_OUT_FILE=out.folded` to write to a file
 instead of the console.
 
