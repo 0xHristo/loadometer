@@ -130,16 +130,21 @@ require('./app');
 
 ## Examples
 
-Runnable examples live in [`examples/`](examples) — quick scripts plus
-self-contained repos for every **Node / Bun × CommonJS / ESM** combination. Run
-any of them with npm:
+Runnable examples live in [`examples/`](examples) — quick scripts, self-contained
+repos for every **Node / Bun × JS / TS × CommonJS / ESM** combination, and a
+long-running demo server. Run any of them with npm:
 
 ```sh
-npm run example:node-esm   # Node + native ESM (preload)
-npm run example:bun-esm    # Bun  + native ESM (preload)
-npm run example:node-cjs   # Node + CommonJS
-npm run example:bun-cjs    # Bun  + CommonJS
-npm run examples           # all of the above
+npm run example:1            # console output
+npm run example:2            # writes imports.folded
+
+npm run example:node-js-esm  # Node + JS + native ESM (preload)
+npm run example:bun-ts-esm   # Bun  + TS + native ESM (preload)
+npm run example:node-ts-cjs  # Node + TS + CommonJS
+# …every runtime × language × module system — 8 in total
+
+npm run example:server       # long-running server: hit /load?pkg=…, then Ctrl+C
+npm run examples             # run the whole matrix at once
 ```
 
 See [`examples/README.md`](examples/README.md) for the full matrix. (Bun scripts
