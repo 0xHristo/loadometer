@@ -33,6 +33,14 @@
     "bun"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xHristo/loadometer.git"
+  },
+  "homepage": "https://github.com/0xHristo/loadometer#readme",
+  "bugs": {
+    "url": "https://github.com/0xHristo/loadometer/issues"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
