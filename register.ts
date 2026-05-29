@@ -122,7 +122,10 @@ const stack = (id: string) => {
   return names.reverse().join(';');
 };
 
-process.on('exit', () => {
+let flushed = false;
+const flush = () => {
+  if (flushed) return;
+  flushed = true;
   let lines = '';
   for (const [id, t] of ms) {
     const s = stack(id);
@@ -130,4 +133,14 @@ process.on('exit', () => {
   }
   if (out) writeFileSync(out, lines);
   else if (lines) process.stdout.write(lines);
-});
+};
+
+process.on('exit', flush);
+// Long-running processes (servers) are usually stopped with Ctrl+C / kill,
+// which doesn't trigger `exit` — flush on the signal, then terminate.
+for (const sig of ['SIGINT', 'SIGTERM'] as const) {
+  process.once(sig, () => {
+    flush();
+    process.exit(0);
+  });
+}
