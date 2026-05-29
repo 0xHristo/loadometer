@@ -30,7 +30,8 @@
     "esm",
     "nodejs",
     "node",
-    "bun"
+    "bun",
+    "coldstart"
   ],
   "license": "MIT",
   "repository": {
