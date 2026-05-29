@@ -9,7 +9,7 @@
  *
  * where a;b;c is the import chain and the number is how long that load took.
  *
- * By default the lines are printed to stdout; set DEPS_OUT_FILE to write them
+ * By default the lines are printed to stdout; set LOADOMETER_OUT_FILE to write them
  * to a file instead.
  *
  * Run it from the repo root (Node runs the TypeScript source directly):
@@ -27,4 +27,4 @@ require('typescript');
 
 // deps reports through a buffered PerformanceObserver, which flushes on the
 // next tick — keep the process alive briefly so the lines get written.
-setTimeout(() => {}, 100);
+setTimeout(() => { }, 100);

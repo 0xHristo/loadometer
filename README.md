@@ -40,10 +40,10 @@ Each line is an import chain and how many milliseconds that load took.
 
 ## Run it: write to a file
 
-Set `DEPS_OUT_FILE` to write the folded stacks to a file instead of the console:
+Set `LOADOMETER_OUT_FILE` to write the folded stacks to a file instead of the console:
 
 ```sh
-DEPS_OUT_FILE=imports.folded node app.js
+LOADOMETER_OUT_FILE=imports.folded node app.js
 ```
 
 ## Visualize it on the web
@@ -66,7 +66,7 @@ Runnable examples are in [`examples/`](examples):
 
 ```sh
 node examples/example-1.cjs                              # console output
-DEPS_OUT_FILE=imports.folded node examples/example-2.cjs # file + flame graph
+LOADOMETER_OUT_FILE=imports.folded node examples/example-2.cjs # file + flame graph
 ```
 
 ## Notes

@@ -28,7 +28,7 @@ test('deps output matches the expected folded stacks', () => {
   const out = join(mkdtempSync(join(tmpdir(), 'deps-test-')), 'out.folded');
   execFileSync(process.execPath, [entry], {
     cwd: dirname(out),
-    env: { ...process.env, DEPS_DIST: depsSource, DEPS_OUT_FILE: out },
+    env: { ...process.env, DEPS_DIST: depsSource, LOADOMETER_OUT_FILE: out },
   });
 
   const actual = stacks(readFileSync(out, 'utf8'));

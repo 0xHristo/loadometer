@@ -1,11 +1,11 @@
 /**
  * Turning the output into a flame graph.
  *
- * Set DEPS_OUT_FILE and deps writes folded stacks there — exactly the input
+ * Set LOADOMETER_OUT_FILE and deps writes folded stacks there — exactly the input
  * format flame-graph tools consume. Node runs the TypeScript source directly,
  * so there is no build step:
  *
- *     DEPS_OUT_FILE=imports.folded node examples/example-2.cjs
+ *     LOADOMETER_OUT_FILE=imports.folded node examples/example-2.cjs
  *
  *     # then render with any folded-stack tool, e.g.
  *     npx inferno imports.folded > imports.svg          # inferno (npm)
@@ -26,4 +26,4 @@ require('typescript');
 require('tsup');
 
 // Let the buffered observer flush to the file before the process exits.
-setTimeout(() => {}, 200);
+setTimeout(() => { }, 200);
