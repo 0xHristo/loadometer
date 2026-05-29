@@ -1,7 +1,7 @@
 {
   "name": "loadometer",
-  "version": "0.2.0",
-  "description": "Import `loadometer` at the top of your entry file to print folded stacks of module require() times (pipe into a flame graph).",
+  "version": "0.2.1",
+  "description": "Profile how long your app spends loading modules (require and import, Node and Bun) as folded stacks you can render into a flame graph.",
   "keywords": [
     "flamegraph",
     "flame-graph",
@@ -27,6 +27,7 @@
     "observability",
     "commonjs",
     "cjs",
+    "esm",
     "nodejs",
     "node",
     "bun"
