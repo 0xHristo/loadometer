@@ -71,7 +71,6 @@ LOADOMETER_OUT_FILE=imports.folded node examples/example-2.cjs # file + flame gr
 
 ## Notes
 
-- Loads under 1ms are skipped to keep the graph readable.
 - `loadometer` measures `require()` loads. If your `import` statements compile to
   `require()` — TypeScript or Babel targeting CommonJS, `ts-node`, `tsx` — they're
   captured. Pure native ESM (`"type": "module"` with no transpilation) isn't,
