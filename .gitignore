@@ -5,4 +5,6 @@ dist
 
 # generated profiler output
 *.folded
-.DS_store
+
+# macOS
+.DS_Store
